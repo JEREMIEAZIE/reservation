@@ -38,9 +38,9 @@
     <div class="row">
       <nav class="col-md-2 d-none d-md-block sidebar">
         <h4 class="text-center">Hotel Admin</h4>
-        <a href="#register" class="active" onclick="showSection('register')"><i class="fas fa-edit me-2"></i> Register</a>
-        <a href="#view" onclick="showSection('view')"><i class="fas fa-eye me-2"></i> View</a>
-        <a href="#delete" onclick="showSection('delete')"><i class="fas fa-trash me-2"></i> Delete</a>
+        <a href="#register" class="active" onclick="showSection('register', event)"><i class="fas fa-edit me-2"></i> Register</a>
+        <a href="#view" onclick="showSection('view', event)"><i class="fas fa-eye me-2"></i> View</a>
+        <a href="#delete" onclick="showSection('delete', event)"><i class="fas fa-trash me-2"></i> Delete</a>
       </nav>
       <main class="col-md-10 ms-sm-auto col-lg-10 content">
         <h2 id="sectionTitle">Register Reservation</h2>
@@ -68,19 +68,19 @@
                     <label class="form-label">Room Type</label>
                     <select class="form-select" id="roomType" onchange="updateTotalCost()" required>
                       <option value="">Select</option>
-                      <option>Single</option>
-                      <option>Double</option>
-                      <option>Suite</option>
-                      <option>Deluxe</option>
+                      <option value="Single">Single</option>
+                      <option value="Double">Double</option>
+                      <option value="Suite">Suite</option>
+                      <option value="Deluxe">Deluxe</option>
                     </select>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Package</label>
                     <select class="form-select" id="package" onchange="updateTotalCost()">
                       <option value="None">None</option>
-                      <option>Breakfast</option>
-                      <option>Airport Pickup</option>
-                      <option>Spa Access</option>
+                      <option value="Breakfast">Breakfast</option>
+                      <option value="Airport Pickup">Airport Pickup</option>
+                      <option value="Spa Access">Spa Access</option>
                     </select>
                   </div>
                 </div>
@@ -139,7 +139,8 @@
   </div>
 
   <script>
-    function showSection(id) {
+    function showSection(id, event) {
+      event.preventDefault();
       document.getElementById('registerSection').classList.add('d-none');
       document.getElementById('viewSection').classList.add('d-none');
       document.getElementById('deleteSection').classList.add('d-none');
