@@ -6,7 +6,7 @@
   <title>Hotel Reservation</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js"></script>
   <script src="firebase-config.js"></script>
   <style>
     body { padding-top: 20px; }
@@ -55,11 +55,10 @@
 </div>
 
 <script>
-// Initialize Firebase (in firebase-config.js)
-const db = firebase.database();
+const db = firebase.firestore();
 
 // Register
-document.getElementById("reservationForm").addEventListener("submit", function (e) {
+document.getElementById("reservationForm").addEventListener("submit", async function (e) {
   e.preventDefault();
   const name = document.getElementById("name").value;
   const checkin = document.getElementById("checkin").value;
@@ -67,52 +66,47 @@ document.getElementById("reservationForm").addEventListener("submit", function (
   const roomType = document.getElementById("roomType").value;
 
   if (name && checkin && checkout && roomType) {
-    const id = Date.now().toString();
-    db.ref("reservations/" + id).set({ name, checkin, checkout, roomType });
+    await db.collection("reservations").add({ name, checkin, checkout, roomType });
     document.getElementById("registerMsg").innerText = "Reservation submitted!";
     document.getElementById("reservationForm").reset();
   }
 });
 
 // View
-function loadReservations() {
-  db.ref("reservations").once("value", (snapshot) => {
-    const data = snapshot.val();
-    let html = '<ul class="list-group">';
-    for (let id in data) {
-      const r = data[id];
-      html += `<li class="list-group-item">
-        <strong>${r.name}</strong><br>
-        ${r.checkin} to ${r.checkout}<br>
-        Room: ${r.roomType}
-      </li>`;
-    }
-    html += '</ul>';
-    document.getElementById("reservationsList").innerHTML = html;
+async function loadReservations() {
+  const snapshot = await db.collection("reservations").get();
+  let html = '<ul class="list-group">';
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    html += `<li class="list-group-item">
+      <strong>${r.name}</strong><br>
+      ${r.checkin} to ${r.checkout}<br>
+      Room: ${r.roomType}
+    </li>`;
   });
+  html += '</ul>';
+  document.getElementById("reservationsList").innerHTML = html;
 }
 
 // Delete
-function loadDeleteList() {
-  db.ref("reservations").once("value", (snapshot) => {
-    const data = snapshot.val();
-    let html = '';
-    for (let id in data) {
-      const r = data[id];
-      html += `<div class="card mb-2">
-        <div class="card-body">
-          <h5 class="card-title">${r.name}</h5>
-          <p>${r.checkin} to ${r.checkout} | ${r.roomType}</p>
-          <button class="btn btn-danger" onclick="deleteReservation('${id}')">Delete</button>
-        </div>
-      </div>`;
-    }
-    document.getElementById("deleteList").innerHTML = html;
+async function loadDeleteList() {
+  const snapshot = await db.collection("reservations").get();
+  let html = '';
+  snapshot.forEach(doc => {
+    const r = doc.data();
+    html += `<div class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">${r.name}</h5>
+        <p>${r.checkin} to ${r.checkout} | ${r.roomType}</p>
+        <button class="btn btn-danger" onclick="deleteReservation('${doc.id}')">Delete</button>
+      </div>
+    </div>`;
   });
+  document.getElementById("deleteList").innerHTML = html;
 }
 
-function deleteReservation(id) {
-  db.ref("reservations/" + id).remove();
+async function deleteReservation(id) {
+  await db.collection("reservations").doc(id).delete();
   loadDeleteList();
   loadReservations();
 }
