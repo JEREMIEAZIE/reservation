@@ -3,269 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hostel Reservation Dashboard</title>
+  <title>Hotel Reservation Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
     body {
-      background-color: #f8f9fa;
+      background-color: #f4f6f9;
     }
-    .container {
-      max-width: 900px;
-      margin-top: 30px;
+    .sidebar {
+      height: 100vh;
+      background-color: #343a40;
+      padding-top: 20px;
+      color: white;
     }
-    .card {
-      margin-bottom: 20px;
+    .sidebar a {
+      color: white;
+      display: block;
+      padding: 15px;
+      text-decoration: none;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #495057;
+    }
+    .content {
+      padding: 20px;
+    }
+    .table th, .table td {
+      vertical-align: middle;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="text-center mb-4">Hotel Reservation System</h1>
-    <ul class="nav nav-tabs" id="tabMenu">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="tab" href="#register">Register</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#view">View</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#delete">Delete</a>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane fade show active" id="register">
-        <div class="card card-body">
-          <form id="reservationForm">
-            <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input type="text" class="form-control" id="name" required />
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Check-in</label>
-                <input type="date" class="form-control" id="checkin" onchange="updateTotalCost()" required />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Check-out</label>
-                <input type="date" class="form-control" id="checkout" onchange="updateTotalCost()" required />
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Room Type</label>
-                <select class="form-select" id="roomType" onchange="updateTotalCost()" required>
-                  <option value="">Select</option>
-                  <option>Single</option>
-                  <option>Double</option>
-                  <option>Suite</option>
-                  <option>Deluxe</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Package</label>
-                <select class="form-select" id="package" onchange="updateTotalCost()">
-                  <option value="None">None</option>
-                  <option>Breakfast</option>
-                  <option>Airport Pickup</option>
-                  <option>Spa Access</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <strong id="totalCost">Total Cost: Rs 0</strong>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <div class="mt-2 text-success" id="registerMsg"></div>
-          </form>
-        </div>
-      </div>
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block sidebar">
+        <h4 class="text-center">Hotel Admin</h4>
+        <a href="#register" class="active" onclick="showSection('register')"><i class="fas fa-edit me-2"></i> Register</a>
+        <a href="#view" onclick="showSection('view')"><i class="fas fa-eye me-2"></i> View</a>
+        <a href="#delete" onclick="showSection('delete')"><i class="fas fa-trash me-2"></i> Delete</a>
+      </nav>
+      <main class="col-md-10 ms-sm-auto col-lg-10 content">
+        <h2 id="sectionTitle">Register Reservation</h2>
 
-      <div class="tab-pane fade" id="view">
-        <div class="card card-body">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Room</th>
-                <th>Package</th>
-                <th>Total (Rs)</th>
-              </tr>
-            </thead>
-            <tbody id="reservationsTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+        <section id="registerSection">
+          <div class="card">
+            <div class="card-body">
+              <form id="reservationForm">
+                <div class="mb-3">
+                  <label class="form-label">Name</label>
+                  <input type="text" class="form-control" id="name" required />
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Check-in</label>
+                    <input type="date" class="form-control" id="checkin" onchange="updateTotalCost()" required />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Check-out</label>
+                    <input type="date" class="form-control" id="checkout" onchange="updateTotalCost()" required />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Room Type</label>
+                    <select class="form-select" id="roomType" onchange="updateTotalCost()" required>
+                      <option value="">Select</option>
+                      <option>Single</option>
+                      <option>Double</option>
+                      <option>Suite</option>
+                      <option>Deluxe</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Package</label>
+                    <select class="form-select" id="package" onchange="updateTotalCost()">
+                      <option value="None">None</option>
+                      <option>Breakfast</option>
+                      <option>Airport Pickup</option>
+                      <option>Spa Access</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <strong id="totalCost">Total Cost: Rs 0</strong>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <div class="mt-2 text-success" id="registerMsg"></div>
+              </form>
+            </div>
+          </div>
+        </section>
 
-      <div class="tab-pane fade" id="delete">
-        <div class="card card-body">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Room</th>
-                <th>Package</th>
-                <th>Total (Rs)</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="deleteTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+        <section id="viewSection" class="d-none">
+          <div class="card">
+            <div class="card-body">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Room</th>
+                    <th>Package</th>
+                    <th>Total (Rs)</th>
+                  </tr>
+                </thead>
+                <tbody id="reservationsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="deleteSection" class="d-none">
+          <div class="card">
+            <div class="card-body">
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Room</th>
+                    <th>Package</th>
+                    <th>Total (Rs)</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="deleteTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
+
+  <script>
+    function showSection(id) {
+      document.getElementById('registerSection').classList.add('d-none');
+      document.getElementById('viewSection').classList.add('d-none');
+      document.getElementById('deleteSection').classList.add('d-none');
+      document.getElementById(id + 'Section').classList.remove('d-none');
+      document.getElementById('sectionTitle').innerText = id.charAt(0).toUpperCase() + id.slice(1) + ' Reservation';
+      const links = document.querySelectorAll('.sidebar a');
+      links.forEach(link => link.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
 
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script>
-    const db = firebase.firestore();
-
-    const roomPrices = {
-      "Single": 100,
-      "Double": 150,
-      "Suite": 250,
-      "Deluxe": 300
-    };
-
-    const packagePrices = {
-      "None": 0,
-      "Breakfast": 20,
-      "Airport Pickup": 40,
-      "Spa Access": 60
-    };
-
-    function calculateNights(checkin, checkout) {
-      const inDate = new Date(checkin);
-      const outDate = new Date(checkout);
-      const diffTime = outDate - inDate;
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    }
-
-    function updateTotalCost() {
-      const roomType = document.getElementById("roomType").value;
-      const packageOption = document.getElementById("package").value;
-      const checkin = document.getElementById("checkin").value;
-      const checkout = document.getElementById("checkout").value;
-
-      if (roomType && packageOption && checkin && checkout) {
-        const nights = calculateNights(checkin, checkout);
-        const roomCost = roomPrices[roomType] * nights;
-        const packageCost = packagePrices[packageOption];
-        const total = roomCost + packageCost;
-        document.getElementById("totalCost").innerText = `Total Cost: Rs ${total}`;
-        return total;
-      }
-      document.getElementById("totalCost").innerText = "Total Cost: Rs 0";
-      return 0;
-    }
-
-    document.getElementById("reservationForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const checkin = document.getElementById("checkin").value;
-      const checkout = document.getElementById("checkout").value;
-      const roomType = document.getElementById("roomType").value;
-      const packageOption = document.getElementById("package").value;
-      const totalCost = updateTotalCost();
-
-      if (!name || !checkin || !checkout || !roomType || !packageOption || calculateNights(checkin, checkout) <= 0) {
-        alert("Please complete all fields correctly.");
-        return;
-      }
-
-      try {
-        await db.collection("reservations").add({
-          name,
-          checkin,
-          checkout,
-          roomType,
-          package: packageOption,
-          totalCost,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-        document.getElementById("registerMsg").innerText = "Reservation submitted successfully!";
-        document.getElementById("reservationForm").reset();
-        updateTotalCost();
-        loadReservations();
-        loadDeleteList();
-      } catch (err) {
-        alert("Error submitting reservation: " + err.message);
-      }
-    });
-
-    async function loadReservations() {
-      const snapshot = await db.collection("reservations").orderBy("createdAt", "desc").get();
-      const tbody = document.getElementById("reservationsTableBody");
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No reservations found.</td></tr>`;
-        return;
-      }
-      let rows = "";
-      snapshot.forEach(doc => {
-        const r = doc.data();
-        rows += `
-          <tr>
-            <td>${r.name}</td>
-            <td>${r.checkin}</td>
-            <td>${r.checkout}</td>
-            <td>${r.roomType}</td>
-            <td>${r.package}</td>
-            <td>Rs ${r.totalCost}</td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = rows;
-    }
-
-    async function loadDeleteList() {
-      const snapshot = await db.collection("reservations").orderBy("createdAt", "desc").get();
-      const tbody = document.getElementById("deleteTableBody");
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No reservations to delete.</td></tr>`;
-        return;
-      }
-      let rows = "";
-      snapshot.forEach(doc => {
-        const r = doc.data();
-        rows += `
-          <tr>
-            <td>${r.name}</td>
-            <td>${r.checkin}</td>
-            <td>${r.checkout}</td>
-            <td>${r.roomType}</td>
-            <td>${r.package}</td>
-            <td>Rs ${r.totalCost}</td>
-            <td><button class="btn btn-sm btn-danger" onclick="deleteReservation('${doc.id}')"><i class="fas fa-trash"></i> Delete</button></td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = rows;
-    }
-
-    async function deleteReservation(id) {
-      if (confirm("Are you sure you want to delete this reservation?")) {
-        try {
-          await db.collection("reservations").doc(id).delete();
-          loadReservations();
-          loadDeleteList();
-        } catch (err) {
-          alert("Error deleting reservation: " + err.message);
-        }
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadReservations();
-      loadDeleteList();
-      updateTotalCost();
-    });
-  </script>
+  <script src="reservation-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
