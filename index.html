@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Reservation</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel Reservation with Packages</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js"></script>
   <script src="firebase-config.js"></script>
@@ -12,6 +12,7 @@
     body { padding-top: 20px; }
     .tab-content { margin-top: 20px; }
     .form-control, .form-select { margin-bottom: 15px; }
+    #totalCost { font-weight: bold; font-size: 1.2em; margin-bottom: 15px; }
   </style>
 </head>
 <body>
@@ -28,15 +29,24 @@
     <!-- Register Tab -->
     <div id="register" class="tab-pane fade show active">
       <form id="reservationForm">
-        <input type="text" class="form-control" id="name" placeholder="Full Name" required>
-        <input type="date" class="form-control" id="checkin" required>
-        <input type="date" class="form-control" id="checkout" required>
+        <input type="text" class="form-control" id="name" placeholder="Full Name" required />
+        <input type="date" class="form-control" id="checkin" required />
+        <input type="date" class="form-control" id="checkout" required />
         <select class="form-select" id="roomType" required>
           <option value="">Select Room Type</option>
-          <option value="Single">Single</option>
-          <option value="Double">Double</option>
-          <option value="Suite">Suite</option>
+          <option value="Single">Single - $100/night</option>
+          <option value="Double">Double - $150/night</option>
+          <option value="Suite">Suite - $250/night</option>
         </select>
+        <select class="form-select" id="package" required>
+          <option value="">Select Package</option>
+          <option value="None">None - $0</option>
+          <option value="Breakfast">Breakfast Included - $20</option>
+          <option value="Airport Pickup">Airport Pickup - $40</option>
+          <option value="Spa Access">Spa Access - $60</option>
+        </select>
+
+        <div id="totalCost">Total Cost: $0</div>
         <button type="submit" class="btn btn-primary w-100">Submit Reservation</button>
       </form>
       <div id="registerMsg" class="mt-3"></div>
@@ -55,70 +65,134 @@
 </div>
 
 <script>
-const db = firebase.firestore();
+  const db = firebase.firestore();
 
-// Register
-document.getElementById("reservationForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const name = document.getElementById("name").value;
-  const checkin = document.getElementById("checkin").value;
-  const checkout = document.getElementById("checkout").value;
-  const roomType = document.getElementById("roomType").value;
+  // Room prices per night
+  const roomPrices = {
+    Single: 100,
+    Double: 150,
+    Suite: 250,
+  };
 
-  if (name && checkin && checkout && roomType) {
-    await db.collection("reservations").add({ name, checkin, checkout, roomType });
-    document.getElementById("registerMsg").innerText = "Reservation submitted!";
-    document.getElementById("reservationForm").reset();
+  // Package prices flat
+  const packagePrices = {
+    None: 0,
+    Breakfast: 20,
+    "Airport Pickup": 40,
+    "Spa Access": 60,
+  };
+
+  // Calculate nights between two dates
+  function calculateNights(checkin, checkout) {
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
+    const diffTime = checkoutDate - checkinDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
   }
-});
 
-// View
-async function loadReservations() {
-  const snapshot = await db.collection("reservations").get();
-  let html = '<ul class="list-group">';
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    html += `<li class="list-group-item">
-      <strong>${r.name}</strong><br>
-      ${r.checkin} to ${r.checkout}<br>
-      Room: ${r.roomType}
-    </li>`;
+  function updateTotalCost() {
+    const roomType = document.getElementById("roomType").value;
+    const packageOption = document.getElementById("package").value;
+    const checkin = document.getElementById("checkin").value;
+    const checkout = document.getElementById("checkout").value;
+
+    if (roomType && packageOption && checkin && checkout) {
+      const nights = calculateNights(checkin, checkout);
+      const roomCost = roomPrices[roomType] * nights;
+      const packageCost = packagePrices[packageOption];
+      const total = roomCost + packageCost;
+      document.getElementById("totalCost").innerText = `Total Cost: $${total}`;
+      return total;
+    }
+    document.getElementById("totalCost").innerText = "Total Cost: $0";
+    return 0;
+  }
+
+  // Update total cost whenever relevant inputs change
+  ["roomType", "package", "checkin", "checkout"].forEach(id => {
+    document.getElementById(id).addEventListener("change", updateTotalCost);
   });
-  html += '</ul>';
-  document.getElementById("reservationsList").innerHTML = html;
-}
 
-// Delete
-async function loadDeleteList() {
-  const snapshot = await db.collection("reservations").get();
-  let html = '';
-  snapshot.forEach(doc => {
-    const r = doc.data();
-    html += `<div class="card mb-2">
-      <div class="card-body">
-        <h5 class="card-title">${r.name}</h5>
-        <p>${r.checkin} to ${r.checkout} | ${r.roomType}</p>
-        <button class="btn btn-danger" onclick="deleteReservation('${doc.id}')">Delete</button>
-      </div>
-    </div>`;
+  // Register
+  document.getElementById("reservationForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const checkin = document.getElementById("checkin").value;
+    const checkout = document.getElementById("checkout").value;
+    const roomType = document.getElementById("roomType").value;
+    const packageOption = document.getElementById("package").value;
+    const totalCost = updateTotalCost();
+
+    if (name && checkin && checkout && roomType && packageOption && totalCost > 0) {
+      await db.collection("reservations").add({
+        name,
+        checkin,
+        checkout,
+        roomType,
+        package: packageOption,
+        totalCost,
+      });
+      document.getElementById("registerMsg").innerText = "Reservation submitted!";
+      document.getElementById("reservationForm").reset();
+      updateTotalCost();
+    }
   });
-  document.getElementById("deleteList").innerHTML = html;
-}
 
-async function deleteReservation(id) {
-  await db.collection("reservations").doc(id).delete();
-  loadDeleteList();
-  loadReservations();
-}
+  // View
+  async function loadReservations() {
+    const snapshot = await db.collection("reservations").get();
+    let html = '<ul class="list-group">';
+    snapshot.forEach(doc => {
+      const r = doc.data();
+      html += `<li class="list-group-item">
+        <strong>${r.name}</strong><br>
+        ${r.checkin} to ${r.checkout}<br>
+        Room: ${r.roomType}<br>
+        Package: ${r.package}<br>
+        Total Cost: $${r.totalCost}
+      </li>`;
+    });
+    html += '</ul>';
+    document.getElementById("reservationsList").innerHTML = html;
+  }
 
-// Load on tab show
-const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
-tabs.forEach(tab => {
-  tab.addEventListener('shown.bs.tab', event => {
-    if (event.target.getAttribute('href') === '#view') loadReservations();
-    if (event.target.getAttribute('href') === '#delete') loadDeleteList();
+  // Delete
+  async function loadDeleteList() {
+    const snapshot = await db.collection("reservations").get();
+    let html = '';
+    snapshot.forEach(doc => {
+      const r = doc.data();
+      html += `<div class="card mb-2">
+        <div class="card-body">
+          <h5 class="card-title">${r.name}</h5>
+          <p>${r.checkin} to ${r.checkout} | ${r.roomType}</p>
+          <p>Package: ${r.package}</p>
+          <p><strong>Total Cost: $${r.totalCost}</strong></p>
+          <button class="btn btn-danger" onclick="deleteReservation('${doc.id}')">Delete</button>
+        </div>
+      </div>`;
+    });
+    document.getElementById("deleteList").innerHTML = html;
+  }
+
+  async function deleteReservation(id) {
+    await db.collection("reservations").doc(id).delete();
+    loadDeleteList();
+    loadReservations();
+  }
+
+  // Load on tab show
+  const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+  tabs.forEach(tab => {
+    tab.addEventListener('shown.bs.tab', event => {
+      if (event.target.getAttribute('href') === '#view') loadReservations();
+      if (event.target.getAttribute('href') === '#delete') loadDeleteList();
+    });
   });
-});
+
+  // Initialize total cost display
+  updateTotalCost();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
