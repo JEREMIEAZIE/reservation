@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Reservation</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HotelEdge Reservation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
     .container-fluid {
       display: flex;
       flex-direction: row;
-      flex-wrap: nowrap;
       min-height: 100vh;
     }
     .sidebar {
-      width: 220px;
-      background-color: #f8f9fa;
+      width: 240px;
+      background-color: #343a40;
+      color: white;
       padding-top: 2rem;
+    }
+    .sidebar .nav-link {
+      color: white;
+    }
+    .sidebar .nav-link.active {
+      background-color: #0d6efd;
     }
     .tab-content {
       flex-grow: 1;
       padding: 2rem;
-      background-color: #fff;
+      background-color: #f4f6f8;
     }
     .form-section {
       max-width: 700px;
@@ -33,13 +45,11 @@
       }
       .sidebar {
         width: 100%;
-        height: auto;
-        padding-bottom: 1rem;
       }
     }
   </style>
 </head>
-<body class="bg-light">
+<body>
   <div class="container-fluid">
     <div class="sidebar">
       <ul class="nav flex-column nav-pills" id="sideTabs">
@@ -56,58 +66,60 @@
     </div>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="registerTab">
-        <div class="form-section">
-          <h4>Register Reservation</h4>
+        <div class="form-section bg-white p-4 rounded shadow">
+          <h4 class="mb-3">Register Reservation</h4>
           <div class="mb-3">
-            <label for="roomType" class="form-label">Room Number:</label>
+            <label for="roomType" class="form-label">Room Number</label>
             <select class="form-select" id="roomType">
-              <option value="Room 1">Room 1 - Rs 2000/night</option>
-              <option value="Room 2">Room 2 - Rs 3500/night</option>
-              <option value="Room 3">Room 3 - Rs 5000/night</option>
-              <option value="Room 4">Room 4 - Rs 7000/night</option>
+              <option value="Room 1">Room 1 </option>
+              <option value="Room 2">Room 2 </option>
+              <option value="Room 3">Room 3 </option>
+              <option value="Room 4">Room 4 </option>
             </select>
           </div>
           <div class="mb-3">
-            <label for="package" class="form-label">Package:</label>
+            <label for="package" class="form-label">Package</label>
             <select class="form-select" id="package">
               <option value="None">None</option>
-              <option value="Breakfast">Breakfast - Rs 500</option>
-              <option value="Spa Access">Spa Access - Rs 1500</option>
+              <option value="BB">Bed and breakfast</option>
+              <option value="HC">Half Coute</option>
+              <option value="FC">Full Coute</option>
             </select>
           </div>
           <div class="mb-3">
-            <label for="checkin" class="form-label">Check-in Date:</label>
-            <input type="date" class="form-control" id="checkin">
+            <label for="checkin" class="form-label">Check-in Date</label>
+            <input type="date" class="form-control" id="checkin" />
           </div>
           <div class="mb-3">
-            <label for="checkout" class="form-label">Check-out Date:</label>
-            <input type="date" class="form-control" id="checkout">
+            <label for="checkout" class="form-label">Check-out Date</label>
+            <input type="date" class="form-control" id="checkout" />
           </div>
           <div class="mb-3">
-            <label for="description" class="form-label">Check-in Description:</label>
+            <label for="description" class="form-label">Check-in Description</label>
             <textarea class="form-control" id="description" rows="3" placeholder="Add notes about the customer..."></textarea>
           </div>
           <div class="mb-3">
-            <label for="downPayment" class="form-label">Down Payment (Rs):</label>
-            <input type="number" class="form-control" id="downPayment">
+            <label for="downPayment" class="form-label">Down Payment (Rs)</label>
+            <input type="number" class="form-control" id="downPayment" />
           </div>
-          <div class="mb-3">
-            <label><input type="checkbox" id="airportPickup"> Add Airport Pickup (Rs 1000)</label>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="airportPickup" />
+            <label class="form-check-label" for="airportPickup">Add Airport Pickup (Rs 1000)</label>
           </div>
           <button class="btn btn-success w-100">Submit Reservation</button>
         </div>
       </div>
 
       <div class="tab-pane fade" id="paymentTab">
-        <div class="form-section">
-          <h4>Complete Payment</h4>
+        <div class="form-section bg-white p-4 rounded shadow">
+          <h4 class="mb-3">Complete Payment</h4>
           <div class="mb-3">
-            <label for="reservationId" class="form-label">Reservation ID:</label>
-            <input type="text" class="form-control" id="reservationId">
+            <label for="reservationId" class="form-label">Reservation ID</label>
+            <input type="text" class="form-control" id="reservationId" />
           </div>
           <div class="mb-3">
-            <label for="amountPaid" class="form-label">Amount Paid (Rs):</label>
-            <input type="number" class="form-control" id="amountPaid">
+            <label for="amountPaid" class="form-label">Amount Paid (Rs)</label>
+            <input type="number" class="form-control" id="amountPaid" />
           </div>
           <button class="btn btn-primary w-100">Submit Payment</button>
           <div id="paymentStatus" class="mt-3 text-center"></div>
@@ -115,26 +127,28 @@
       </div>
 
       <div class="tab-pane fade" id="viewTab">
-        <h4>Reservations</h4>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search Reservations">
-        <table id="reservationsTable" class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Room</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Package</th>
-              <th>Airport Pickup</th>
-              <th>Down Payment</th>
-              <th>Description</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Reservation rows will go here -->
-          </tbody>
-        </table>
+        <div class="bg-white p-4 rounded shadow">
+          <h4 class="mb-3">Reservations</h4>
+          <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search Reservations" />
+          <table id="reservationsTable" class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Package</th>
+                <th>Airport Pickup</th>
+                <th>Down Payment</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Reservation rows will go here -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -143,9 +157,10 @@
   <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="firebase-handler.js"></script>
   <script>
     $(document).ready(function () {
-      var table = $('#reservationsTable').DataTable();
+      const table = $('#reservationsTable').DataTable();
       $('#searchInput').on('keyup', function () {
         table.search(this.value).draw();
       });
