@@ -1,166 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hotel Reservation Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Reservation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f4f6f9;
+    .form-container {
+      max-width: 600px;
+      margin: auto;
     }
-    .sidebar {
-      height: 100vh;
-      background-color: #343a40;
-      padding-top: 20px;
-      color: white;
-    }
-    .sidebar a {
-      color: white;
-      display: block;
-      padding: 15px;
-      text-decoration: none;
-    }
-    .sidebar a:hover, .sidebar a.active {
-      background-color: #495057;
-    }
-    .content {
-      padding: 20px;
-    }
-    .table th, .table td {
-      vertical-align: middle;
+    @media (min-width: 768px) {
+      .tab-content {
+        padding: 2rem;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 0.375rem 0.375rem;
+      }
     }
   </style>
 </head>
-<body>
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-2 d-none d-md-block sidebar">
-        <h4 class="text-center">Hotel Admin</h4>
-        <a href="#register" class="active" onclick="showSection('register', event)"><i class="fas fa-edit me-2"></i> Register</a>
-        <a href="#view" onclick="showSection('view', event)"><i class="fas fa-eye me-2"></i> View</a>
-        <a href="#delete" onclick="showSection('delete', event)"><i class="fas fa-trash me-2"></i> Delete</a>
-      </nav>
-      <main class="col-md-10 ms-sm-auto col-lg-10 content">
-        <h2 id="sectionTitle">Register Reservation</h2>
+<body class="bg-light">
+  <div class="container my-4">
+    <h2 class="text-center mb-4">Hotel Reservation System</h2>
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#registerTab" type="button" role="tab">Register</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#paymentTab" type="button" role="tab">Complete Payment</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#viewTab" type="button" role="tab">View & Cancel</button>
+      </li>
+    </ul>
 
-        <section id="registerSection">
-          <div class="card">
-            <div class="card-body">
-              <form id="reservationForm">
-                <div class="mb-3">
-                  <label class="form-label">Name</label>
-                  <input type="text" class="form-control" id="name" required />
-                </div>
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Check-in</label>
-                    <input type="date" class="form-control" id="checkin" onchange="updateTotalCost()" required />
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Check-out</label>
-                    <input type="date" class="form-control" id="checkout" onchange="updateTotalCost()" required />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Room Type</label>
-                    <select class="form-select" id="roomType" onchange="updateTotalCost()" required>
-                      <option value="">Select</option>
-                      <option value="Single">Single</option>
-                      <option value="Double">Double</option>
-                      <option value="Suite">Suite</option>
-                      <option value="Deluxe">Deluxe</option>
-                    </select>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Package</label>
-                    <select class="form-select" id="package" onchange="updateTotalCost()">
-                      <option value="None">None</option>
-                      <option value="Breakfast">Breakfast</option>
-                      <option value="Airport Pickup">Airport Pickup</option>
-                      <option value="Spa Access">Spa Access</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <strong id="totalCost">Total Cost: Rs 0</strong>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <div class="mt-2 text-success" id="registerMsg"></div>
-              </form>
-            </div>
-          </div>
-        </section>
+    <!-- Tabs Content -->
+    <div class="tab-content mt-3 form-container">
+      <div class="tab-pane fade show active" id="registerTab" role="tabpanel">
+        <div class="mb-3">
+          <label for="roomType" class="form-label">Room Type:</label>
+          <select class="form-select" id="roomType">
+            <option value="Single">Single - Rs 2000/night</option>
+            <option value="Double">Double - Rs 3500/night</option>
+            <option value="Suite">Suite - Rs 5000/night</option>
+            <option value="Deluxe">Deluxe - Rs 7000/night</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="package" class="form-label">Package:</label>
+          <select class="form-select" id="package">
+            <option value="None">None</option>
+            <option value="Breakfast">Breakfast - Rs 500</option>
+            <option value="Spa Access">Spa Access - Rs 1500</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="checkin" class="form-label">Check-in Date:</label>
+          <input type="date" class="form-control" id="checkin">
+        </div>
+        <div class="mb-3">
+          <label for="checkout" class="form-label">Check-out Date:</label>
+          <input type="date" class="form-control" id="checkout">
+        </div>
+        <div class="mb-3">
+          <label><input type="checkbox" id="airportPickup"> Add Airport Pickup (Rs 1000)</label>
+        </div>
+        <button class="btn btn-success w-100">Submit Reservation</button>
+      </div>
 
-        <section id="viewSection" class="d-none">
-          <div class="card">
-            <div class="card-body">
-              <table class="table table-bordered">
-                <thead class="table-light">
-                  <tr>
-                    <th>Name</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
-                    <th>Room</th>
-                    <th>Package</th>
-                    <th>Total (Rs)</th>
-                  </tr>
-                </thead>
-                <tbody id="reservationsTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+      <div class="tab-pane fade" id="paymentTab" role="tabpanel">
+        <div class="mb-3">
+          <label for="reservationId" class="form-label">Reservation ID:</label>
+          <input type="text" class="form-control" id="reservationId">
+        </div>
+        <div class="mb-3">
+          <label for="amountPaid" class="form-label">Amount Paid (Rs):</label>
+          <input type="number" class="form-control" id="amountPaid">
+        </div>
+        <button class="btn btn-primary w-100">Submit Payment</button>
+        <div id="paymentStatus" class="mt-3 text-center"></div>
+      </div>
 
-        <section id="deleteSection" class="d-none">
-          <div class="card">
-            <div class="card-body">
-              <table class="table table-bordered">
-                <thead class="table-light">
-                  <tr>
-                    <th>Name</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
-                    <th>Room</th>
-                    <th>Package</th>
-                    <th>Total (Rs)</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="deleteTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      </main>
+      <div class="tab-pane fade" id="viewTab" role="tabpanel">
+        <div class="mb-3">
+          <label for="viewReservationId" class="form-label">Enter Reservation ID:</label>
+          <input type="text" class="form-control" id="viewReservationId">
+        </div>
+        <button class="btn btn-info w-100 mb-2">View Reservation</button>
+        <button class="btn btn-danger w-100">Cancel Reservation</button>
+        <div id="viewResult" class="mt-3 text-center"></div>
+      </div>
     </div>
   </div>
-
-  <script>
-    function showSection(id, event) {
-      event.preventDefault();
-      document.getElementById('registerSection').classList.add('d-none');
-      document.getElementById('viewSection').classList.add('d-none');
-      document.getElementById('deleteSection').classList.add('d-none');
-      document.getElementById(id + 'Section').classList.remove('d-none');
-      document.getElementById('sectionTitle').innerText = id.charAt(0).toUpperCase() + id.slice(1) + ' Reservation';
-      const links = document.querySelectorAll('.sidebar a');
-      links.forEach(link => link.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-  </script>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
-
-  <!-- Your Firebase Config -->
-  <script src="firebase-config.js"></script>
-
-  <!-- Your app logic -->
-  <script src="reservation-app.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
